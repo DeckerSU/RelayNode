@@ -85,7 +85,7 @@ struct __attribute__((packed)) bitcoin_msg_header {
 static_assert(sizeof(struct bitcoin_msg_header) == 4 + 12 + 4 + 4, "__attribute__((packed)) must work");
 
 struct __attribute__((packed)) bitcoin_version_start {
-	uint32_t protocol_version = 70000;
+	uint32_t protocol_version = 170009;
 	uint64_t services = 0;
 	uint64_t timestamp;
 	unsigned char addr_recv[26] = {0};
