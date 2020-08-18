@@ -407,6 +407,6 @@ int main(int argc, char** argv) {
 			} else
 				it++;
 		}
-		fprintf(stderr, "Have %lu local connection(s), %lu block connection(s) and %lu txes conenction(s)\n", localSet.size(), blockSet.size() - txesSet.size(), txesSet.size());
+		fprintf(stderr, "Have %lu local connection(s), %lu block connection(s) and %lu txes connection(s)\n", localSet.size(), blockSet.size() - txesSet.size(), txesSet.size());
 	}
 }
