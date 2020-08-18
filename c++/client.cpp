@@ -232,7 +232,7 @@ private:
 #define CONNECT_TESTS 20
 std::chrono::milliseconds connect_durations[HOSTNAMES_TO_TEST];
 void test_node(int node) {
-	const char* relay = "public.%02d.relay.mattcorallo.com";
+	const char* relay = "public.%02d.relay.kmd.sh";
 	char host[strlen(relay)];
 	sprintf(host, relay, node);
 	sockaddr_in6 addr;
@@ -275,7 +275,7 @@ int main(int argc, char** argv) {
 		return -1;
 #endif
 
-	const char* relay = "public.%02d.relay.mattcorallo.com";
+	const char* relay = "public.%02d.relay.kmd.sh";
 	char host[std::max(argc == 3 ? 0 : strlen(argv[3]), strlen(relay))];
 	if (argc == 3) {
 		while (true) {
