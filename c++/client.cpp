@@ -20,7 +20,7 @@
 #endif // !WIN32
 
 #define BITCOIN_UA_LENGTH 24
-#define BITCOIN_UA {'/', 'R', 'e', 'l', 'a', 'y', 'N', 'e', 't', 'w', 'o', 'r', 'k', 'C', 'l', 'i', 'e', 'n', 't', ':', '4', '2', '/', '\0'}
+#define BITCOIN_UA {'/', 'F', 'a', 's', 't', 'R', 'e', 'l', 'a', 'y', 'K', 'M', 'D', 'C', 'l', 'i', 'e', 'n', 't', ':', '1', '0', '/', '\0'}
 
 #include "crypto/sha2.h"
 #include "flaggedarrayset.h"
