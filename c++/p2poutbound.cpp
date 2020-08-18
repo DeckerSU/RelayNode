@@ -18,7 +18,7 @@
 #endif // !WIN32
 
 #define BITCOIN_UA_LENGTH 22
-#define BITCOIN_UA {'/', 'R', 'e', 'l', 'a', 'y', 'N', 'e', 't', 'w', 'o', 'r', 'k', 'O', 'u', 't', 'b', 'o', 'u', 'n', 'd', '/'}
+#define BITCOIN_UA {'/', 'F', 'a', 's', 't', 'R', 'e', 'l', 'a', 'y', 'K', 'M', 'D', 'O', 'u', 't', 'b', 'o', 'u', 'n', 'd', '/'}
 
 #include "crypto/sha2.h"
 #include "utils.h"

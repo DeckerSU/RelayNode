@@ -14,7 +14,7 @@
 #include <sys/time.h>
 
 #define BITCOIN_UA_LENGTH 27 + 9
-#define BITCOIN_UA {'/', 'R', 'e', 'l', 'a', 'y', 'N', 'e', 't', 'w', 'o', 'r', 'k', 'T', 'e', 'r', 'm', 'i', 'n', 'a', 't', 'o', 'r', ':', '4', '2', '/', '0', '0', '0', '0', '0', '0', '0', '/', '\0'}
+#define BITCOIN_UA {'/', 'F', 'a', 's', 't', 'R', 'e', 'l', 'a', 'y', 'K', 'M', 'D', 'T', 'e', 'r', 'm', 'i', 'n', 'a', 't', 'o', 'r', ':', '1', '0', '/', '0', '0', '0', '0', '0', '0', '0', '/', '\0'}
 
 #include "crypto/sha2.h"
 #include "mruset.h"

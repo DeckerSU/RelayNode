@@ -13,7 +13,7 @@
 #include <fcntl.h>
 
 #define BITCOIN_UA_LENGTH 23
-#define BITCOIN_UA {'/', 'R', 'e', 'l', 'a', 'y', 'N', 'e', 't', 'w', 'o', 'r', 'k', 'S', 'e', 'r', 'v', 'e', 'r', ':', '4', '2', '/'}
+#define BITCOIN_UA {'/', 'F', 'a', 's', 't', 'R', 'e', 'l', 'a', 'y', 'K', 'M', 'D', 'S', 'e', 'r', 'v', 'e', 'r', ':', '1', '0', '/'}
 
 #include "crypto/sha2.h"
 #include "flaggedarrayset.h"
