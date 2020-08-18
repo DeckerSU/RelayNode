@@ -422,7 +422,7 @@ void double_sha256_done(const unsigned char* input, uint64_t byte_count, uint64_
 
 void getblockhash(std::vector<unsigned char>& hashRes, const std::vector<unsigned char>& block, size_t offset) {
 	assert(hashRes.size() == 32);
-	return double_sha256(&block[offset], &hashRes[0], 80);
+	return double_sha256(&block[offset], &hashRes[0], 1487);
 }
 
 class not_hex : public std::exception {};

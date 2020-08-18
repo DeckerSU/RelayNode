@@ -287,7 +287,7 @@ int main(int argc, char** argv) {
 			struct timeval start_send, finish_send;
 			gettimeofday(&start_send, NULL);
 
-			if (bytes->size() < 80)
+			if (bytes->size() < 1487)
 				return;
 			std::vector<unsigned char> fullhash(32);
 			getblockhash(fullhash, *bytes, sizeof(struct bitcoin_msg_header));
