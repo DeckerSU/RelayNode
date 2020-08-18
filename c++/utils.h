@@ -60,7 +60,7 @@ struct relay_msg_header {
 	uint32_t magic, type, length;
 };
 
-#define RELAY_MAGIC_BYTES htonl(0xF2BEEF42)
+#define RELAY_MAGIC_BYTES htonl(0xF2EEE410)
 #define VERSION_STRING "spammy memeater"
 #define MAX_RELAY_TRANSACTION_BYTES 100000
 #define MAX_FAS_TOTAL_SIZE 5000000
@@ -75,7 +75,7 @@ struct relay_msg_header {
 
 
 
-#define BITCOIN_MAGIC htonl(0xf9beb4d9)
+#define BITCOIN_MAGIC htonl(0xf9eee48d)
 struct __attribute__((packed)) bitcoin_msg_header {
 	uint32_t magic;
 	char command[12];
