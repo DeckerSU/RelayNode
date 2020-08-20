@@ -328,9 +328,12 @@ int main(int argc, char** argv) {
 				if (!(*it)->getDisconnectFlags())
 					(*it)->receive_transaction(fullhash, bytes);
 			}
-			for (unsigned int i = 0; i < fullhash.size(); i++)
+
+			/* {
+				for (unsigned int i = 0; i < fullhash.size(); i++)
 				printf("%02x", fullhash[fullhash.size() - i - 1]);
-			printf(" TX from %s\n", from->host.c_str());
+				printf(" TX from %s\n", from->host.c_str());
+			} */
 		};
 
 	printf("Awaiting connections\n");
