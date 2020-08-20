@@ -54,5 +54,13 @@ int main(int argc, char** argv) {
 	one = new P2PClient(argv[1], std::stoul(argv[2]),
 			[&two](std::vector<unsigned char>& msg) { two.send_hashed_message(msg.data(), msg.size()); });
 
-	while (true) { sleep(1000); }
+	while (true) {
+		//sleep(1000);
+		sleep(30); // wait 30 seconds
+		if (!(one->is_connected() && two.is_connected()))
+		{
+			fprintf(stderr, "One of the piped clients is disconnected. Exit.\n");
+			return -1; // exit on disconnect
+		}
+	}
 }
