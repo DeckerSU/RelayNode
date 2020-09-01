@@ -158,7 +158,7 @@ void P2PRelayer::net_process(const std::function<void(std::string)>& disconnect)
 		} else if (!strncmp(header.command, "tx", strlen("tx"))) {
 			provide_transaction(msg);
 		} else if (!strncmp(header.command, "headers", strlen("headers"))) {
-			if (msg->size() <= 1 + 82 || !provide_headers)
+			if (msg->size() <= 1 + 1489 || !provide_headers)
 				continue; // Probably last one
 			provide_headers(*msg);
 
@@ -168,7 +168,7 @@ void P2PRelayer::net_process(const std::function<void(std::string)>& disconnect)
 			req.insert(req.end(), 1, 1);
 
 			std::vector<unsigned char> fullhash(32);
-			getblockhash(fullhash, *msg, msg->size() - 81);
+			getblockhash(fullhash, *msg, msg->size() - 1488);
 			req.insert(req.end(), fullhash.begin(), fullhash.end());
 			req.insert(req.end(), 32, 0);
 

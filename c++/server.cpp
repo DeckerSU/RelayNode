@@ -364,13 +364,13 @@ int main(const int argc, const char** argv) {
 							uint64_t count = read_varint(it, headers.end());
 
 							for (uint64_t i = 0; i < count; i++) {
-								move_forward(it, 81, headers.end());
+								move_forward(it, 1488, headers.end());
 
 								if (*(it - 1) != 0)
 									return;
 
 								std::vector<unsigned char> fullhash(32);
-								getblockhash(fullhash, headers, it - 81 - headers.begin());
+								getblockhash(fullhash, headers, it - 1488 - headers.begin());
 								compressors[0].block_sent(fullhash);
 							}
 
@@ -380,7 +380,7 @@ int main(const int argc, const char** argv) {
 
 	trustedP2PRecv = new P2PClient(argv[1], std::stoul(argv[2]),
 					[&](std::vector<unsigned char>& bytes,  const std::chrono::system_clock::time_point& read_start) {
-						if (bytes.size() < sizeof(struct bitcoin_msg_header) + 80)
+						if (bytes.size() < sizeof(struct bitcoin_msg_header) + 1487)
 							return;
 
 						std::chrono::system_clock::time_point send_start(std::chrono::system_clock::now());
@@ -432,7 +432,7 @@ int main(const int argc, const char** argv) {
 
 	std::function<size_t (RelayNetworkClient*, std::shared_ptr<std::vector<unsigned char> >&, const std::vector<unsigned char>&)> relayBlock =
 		[&](RelayNetworkClient* from, std::shared_ptr<std::vector<unsigned char>> & bytes, const std::vector<unsigned char>& fullhash) {
-			if (bytes->size() < sizeof(struct bitcoin_msg_header) + 80)
+			if (bytes->size() < sizeof(struct bitcoin_msg_header) + 1487)
 				return (size_t)0;
 
 			trustedP2P->receive_block(*bytes);
