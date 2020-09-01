@@ -102,12 +102,15 @@ public:
 	}
 };
 
+// #pragma GCC push_options
+// #pragma GCC optimize ("O0")
 std::tuple<std::shared_ptr<std::vector<unsigned char> >, const char*> RelayNodeCompressor::maybe_compress_block(const std::vector<unsigned char>& hash, const std::vector<unsigned char>& block, bool check_merkle) {
 	std::lock_guard<std::mutex> lock(mutex);
 	FASLockHint faslock(send_tx_cache);
 
-	if (check_merkle && (hash[31] != 0 || hash[30] != 0 || hash[29] != 0 || hash[28] != 0 || hash[27] != 0 || hash[26] != 0 || hash[25] != 0))
-		return std::make_tuple(std::shared_ptr<std::vector<unsigned char> >(), "BAD_WORK");
+	// in Komodo we have so-called "easy-mined" blocks, so, we shouldn't check blockhash for many leading zeroes
+	/*if (check_merkle && (hash[31] != 0 || hash[30] != 0 || hash[29] != 0 || hash[28] != 0 || hash[27] != 0 || hash[26] != 0 || hash[25] != 0))
+		return std::make_tuple(std::shared_ptr<std::vector<unsigned char> >(), "BAD_WORK");*/
 
 	if (blocksAlreadySeen.count(hash))
 		return std::make_tuple(std::shared_ptr<std::vector<unsigned char> >(), "SEEN");
@@ -127,8 +130,9 @@ std::tuple<std::shared_ptr<std::vector<unsigned char> >, const char*> RelayNodeC
 #endif
 
 		move_forward(readit, 32, block.end());
+
 		auto merkle_hash_it = readit;
-		move_forward(readit, 80 - (4 + 32), block.end());
+		move_forward(readit, 1487 - (4 + 32), block.end());
 
 		uint64_t txcount = read_varint(readit, block.end());
 		if (txcount < 1 || txcount > 100000)
@@ -138,14 +142,16 @@ std::tuple<std::shared_ptr<std::vector<unsigned char> >, const char*> RelayNodeC
 		header.type = BLOCK_TYPE;
 		header.length = htonl(txcount);
 		compressed_block->insert(compressed_block->end(), (unsigned char*)&header, ((unsigned char*)&header) + sizeof(header));
-		compressed_block->insert(compressed_block->end(), block.begin() + sizeof(struct bitcoin_msg_header), block.begin() + 80 + sizeof(struct bitcoin_msg_header));
+		compressed_block->insert(compressed_block->end(), block.begin() + sizeof(struct bitcoin_msg_header), block.begin() + 1487 + sizeof(struct bitcoin_msg_header));
 
 		MerkleTreeBuilder merkleTree(check_merkle ? txcount : 0);
 
 		for (uint32_t i = 0; i < txcount; i++) {
 			std::vector<unsigned char>::const_iterator txstart = readit;
 
-			move_forward(readit, 4, block.end());
+
+			move_forward(readit, 4, block.end()); // skip tx version
+			move_forward(readit, 4, block.end()); // skip versiongroupid (TODO: skip if sapling only)
 
 			uint64_t txins = read_varint(readit, block.end());
 			for (uint64_t j = 0; j < txins; j++) {
@@ -159,7 +165,13 @@ std::tuple<std::shared_ptr<std::vector<unsigned char> >, const char*> RelayNodeC
 				move_forward(readit, read_varint(readit, block.end()), block.end());
 			}
 
-			move_forward(readit, 4, block.end());
+			move_forward(readit, 4, block.end()); // skip tx locktime
+			move_forward(readit, 4, block.end()); // skip nExpiryHeight
+			move_forward(readit, 8, block.end()); // skip valueBalance
+			move_forward(readit, read_varint(readit, block.end()), block.end()); // skip vShieldedSpend
+			move_forward(readit, read_varint(readit, block.end()), block.end()); // skip vShieldedOutput
+			move_forward(readit, read_varint(readit, block.end()), block.end()); // skip vjoinsplit
+			// printf("%ld - %02x%02x%02x%02x\n", readit-txstart, *readit, *(readit+1), *(readit+2), *(readit+3));
 
 			int index = send_tx_cache.remove(txstart, readit);
 
@@ -199,6 +211,7 @@ std::tuple<std::shared_ptr<std::vector<unsigned char> >, const char*> RelayNodeC
 
 	return std::make_tuple(compressed_block, (const char*)NULL);
 }
+// #pragma GCC pop_options
 
 struct IndexVector {
 	uint16_t index;
@@ -229,6 +242,8 @@ void tweak_sort(std::vector<IndexPtr>& ptrs, size_t start, size_t end) {
 	}
 }
 
+// #pragma GCC push_options
+// #pragma GCC optimize ("O0")
 std::tuple<uint32_t, std::shared_ptr<std::vector<unsigned char> >, const char*, std::shared_ptr<std::vector<unsigned char> > > RelayNodeCompressor::decompress_relay_block(std::function<ssize_t(char*, size_t)>& read_all, uint32_t message_size, bool check_merkle) {
 	std::lock_guard<std::mutex> lock(mutex);
 	FASLockHint faslock(recv_tx_cache);
@@ -238,10 +253,10 @@ std::tuple<uint32_t, std::shared_ptr<std::vector<unsigned char> >, const char*, 
 
 	uint32_t wire_bytes = 4*3;
 
-	auto block = std::make_shared<std::vector<unsigned char> > (sizeof(bitcoin_msg_header) + 80);
+	auto block = std::make_shared<std::vector<unsigned char> > (sizeof(bitcoin_msg_header) + 1487);
 	block->reserve(1000000 + sizeof(bitcoin_msg_header));
 
-	if (read_all((char*)&(*block)[sizeof(bitcoin_msg_header)], 80) != 80)
+	if (read_all((char*)&(*block)[sizeof(bitcoin_msg_header)], 1487) != 1487)
 		return std::make_tuple(0, std::shared_ptr<std::vector<unsigned char> >(NULL), "failed to read block header", std::shared_ptr<std::vector<unsigned char> >(NULL));
 
 #ifndef TEST_DATA
@@ -254,8 +269,10 @@ std::tuple<uint32_t, std::shared_ptr<std::vector<unsigned char> >, const char*, 
 	getblockhash(*fullhashptr.get(), *block, sizeof(struct bitcoin_msg_header));
 	blocksAlreadySeen.insert(*fullhashptr.get());
 
+	/*
 	if (check_merkle && ((*fullhashptr)[31] != 0 || (*fullhashptr)[30] != 0 || (*fullhashptr)[29] != 0 || (*fullhashptr)[28] != 0 || (*fullhashptr)[27] != 0 || (*fullhashptr)[26] != 0 || (*fullhashptr)[25] != 0))
 		return std::make_tuple(0, std::shared_ptr<std::vector<unsigned char> >(NULL), "block hash did not meet minimum difficulty target", std::shared_ptr<std::vector<unsigned char> >(NULL));
+	*/
 
 	auto vartxcount = varint(message_size);
 	block->insert(block->end(), vartxcount.begin(), vartxcount.end());
@@ -318,4 +335,4 @@ std::tuple<uint32_t, std::shared_ptr<std::vector<unsigned char> >, const char*, 
 
 	return std::make_tuple(wire_bytes, block, (const char*) NULL, fullhashptr);
 }
-
+// #pragma GCC pop_options

@@ -23,7 +23,7 @@ std::linear_congruential_engine<std::uint_fast32_t, 48271, 0, 2147483647> engine
 void fill_txv(std::vector<unsigned char>& block, std::vector<std::shared_ptr<std::vector<unsigned char> > >& txVectors, float includeP) {
 	std::vector<unsigned char>::const_iterator readit = block.begin();
 	move_forward(readit, sizeof(struct bitcoin_msg_header), block.end());
-	move_forward(readit, 80, block.end());
+	move_forward(readit, 1487, block.end());
 	uint32_t txcount = read_varint(readit, block.end());
 
 	std::uniform_real_distribution<double> distribution(0.0, 1.0);
@@ -32,6 +32,7 @@ void fill_txv(std::vector<unsigned char>& block, std::vector<std::shared_ptr<std
 		std::vector<unsigned char>::const_iterator txstart = readit;
 
 		move_forward(readit, 4, block.end());
+		move_forward(readit, 4, block.end()); // skip versiongroupid (TODO: skip if sapling only)
 
 		uint32_t txins = read_varint(readit, block.end());
 		for (uint32_t j = 0; j < txins; j++) {
@@ -48,6 +49,11 @@ void fill_txv(std::vector<unsigned char>& block, std::vector<std::shared_ptr<std
 		}
 
 		move_forward(readit, 4, block.end());
+		move_forward(readit, 4, block.end()); // skip nExpiryHeight
+		move_forward(readit, 8, block.end()); // skip valueBalance
+		move_forward(readit, read_varint(readit, block.end()), block.end()); // skip vShieldedSpend
+		move_forward(readit, read_varint(readit, block.end()), block.end()); // skip vShieldedOutput
+		move_forward(readit, read_varint(readit, block.end()), block.end()); // skip vjoinsplit
 
 		if (distribution(engine) < includeP)
 			txVectors.push_back(std::make_shared<std::vector<unsigned char> >(txstart, readit));
@@ -108,6 +114,7 @@ std::tuple<std::shared_ptr<std::vector<unsigned char> >, const char*> __attribut
 void test_compress_block(std::vector<unsigned char>& data, std::vector<std::shared_ptr<std::vector<unsigned char> > > txVectors) {
 	std::vector<unsigned char> fullhash(32);
 	getblockhash(fullhash, data, sizeof(struct bitcoin_msg_header));
+	// printf("blockhash: "); for (size_t i = 0; i < fullhash.size(); ++i ) { printf("%02x", fullhash[31-i]); } printf("\n");
 
 	RelayNodeCompressor sender(false), tester(false), tester2(false), receiver(false);
 
